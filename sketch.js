@@ -1,7 +1,7 @@
 
 function getFrame(faction,health) {
-  let fac = loadImage('/docs/assets//'+faction+'Frame'+health+'.png',(loadedFrame)=>{frame=loadedFrame;refresh();});
-  skillPlate = loadImage('/docs/assets//SkillPlate'+faction+'.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
+  let fac = loadImage('./docs/assets//'+faction+'Frame'+health+'.png',(loadedFrame)=>{frame=loadedFrame;refresh();});
+  skillPlate = loadImage('./docs/assets//SkillPlate'+faction+'.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
   return fac;
 }
 
@@ -227,8 +227,8 @@ function setup() {
   savebtn.position(460,200);
 
   frame = getFrame(in_faction.value(),in_hp.value());
-  skillPlate = loadImage('/docs/assets//SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
-  loadImage('/docs/assets//dummy.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
+  skillPlate = loadImage('./docs/assets//SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
+  loadImage('./docs/assets//dummy.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
 }
 
 function saveCard()
