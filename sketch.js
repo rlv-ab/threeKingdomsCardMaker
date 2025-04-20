@@ -1,7 +1,7 @@
 
 function getFrame(faction,health) {
-  let fac = loadImage('/assets/'+faction+'Frame'+health+'.png',(loadedFrame)=>{frame=loadedFrame;refresh();});
-  skillPlate = loadImage('/assets/SkillPlate'+faction+'.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
+  let fac = loadImage('/docs/assets//'+faction+'Frame'+health+'.png',(loadedFrame)=>{frame=loadedFrame;refresh();});
+  skillPlate = loadImage('/docs/assets//SkillPlate'+faction+'.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
   return fac;
 }
 
@@ -122,10 +122,10 @@ class Skill
 
 function preload()
 {
-  skillTextFontBold = loadFont('./assets/quadrat-serial-medium.ttf')
-  skillTextFont = loadFont('./assets/Quadrat-Serial Regular.ttf')
-  skillTitleFont = loadFont('./assets/Impuls BT.ttf')
-  nameFont = loadFont('./assets/Mistral Regular.ttf')
+  skillTextFontBold = loadFont('./docs/assets//quadrat-serial-medium.ttf')
+  skillTextFont = loadFont('./docs/assets//Quadrat-Serial Regular.ttf')
+  skillTitleFont = loadFont('./docs/assets//Impuls BT.ttf')
+  nameFont = loadFont('./docs/assets//Mistral Regular.ttf')
 }
 
 var in_faction,in_chname, in_hp, in_art, savebtn,
@@ -227,8 +227,8 @@ function setup() {
   savebtn.position(460,200);
 
   frame = getFrame(in_faction.value(),in_hp.value());
-  skillPlate = loadImage('/assets/SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
-  loadImage('/assets/dummy.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
+  skillPlate = loadImage('/docs/assets//SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
+  loadImage('/docs/assets//dummy.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
 }
 
 function saveCard()
@@ -330,8 +330,8 @@ function refresh()
 function keyPressed()
 {
   //frame = getFrame('Qun',3);
- // skillPlate = loadImage('/assets/SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
-  //loadImage('/assets/renLin.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
+ // skillPlate = loadImage('/docs/assets//SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
+  //loadImage('/docs/assets//renLin.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
   setTimeout(() => {
     refresh();
   }, "500");
