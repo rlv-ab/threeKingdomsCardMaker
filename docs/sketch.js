@@ -388,9 +388,9 @@ function refresh()
     }
   }
   textPos+=42
-  if(textPos>450)
+  if(textPos>400)
   {
-    namepos += 100+(textPos-500)
+    namepos += 100+(textPos-480)
   }
   //add text to text box and add it to card
   fullCard.image(pg,textX,h-textPos);
