@@ -404,7 +404,7 @@ function refresh()
         fullCard.textLeading(24);
         let offset=0;
         if(plateArr[t].value() == 'Modify' || 
-           plateArr.value() == 'Unlock')
+           plateArr[t].value() == 'Unlock')
         {
           offset =-3
         }
