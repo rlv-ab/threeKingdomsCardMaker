@@ -20,6 +20,7 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
   let linectr = 0;
 	for (let i = 0; i < wordsStr.length; i++) 
     {
+      card.textSize(16);
       card.textFont(skillTextFont);
       card.fill(20)
       var wordStr = wordsStr[i] 
@@ -383,7 +384,7 @@ function refresh()
   {
     if(skillArr[t].filled != 0)
     {
-      textSkill(pg,skillArr[t].text,65,textPos+19,h,boxW-47,skillArr[t]);
+      textSkill(pg,skillArr[t].text,65,textPos+19,h,boxW-67,skillArr[t]);
       textPos = skillArr[t].pos-42;
     }
   }
