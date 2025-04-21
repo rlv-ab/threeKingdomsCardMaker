@@ -41,7 +41,39 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
           card.textFont(skillTextFontBold);
           card.fill(234,0,0);
         }
-      
+      if(wordStr.includes('&&'))
+      {
+        if(wordStr.includes('spades'))
+        {
+          wordStr = wordStr.replace('&&spades','\u2660');
+          card.textFont('Arial');
+          card.textSize(22);
+          card.fill(0);
+        }
+        else if(wordStr.includes('hearts'))
+        {
+          wordStr = wordStr.replace('&&hearts','\u2665');
+          card.textFont('Arial');
+          card.textSize(22);
+          card.fill(234,0,0);
+          
+        }
+        else if(wordStr.includes('diamonds'))
+        {
+          wordStr = wordStr.replace('&&diamonds','\u2666');
+          card.textFont('Arial');
+          card.textSize(22);
+          card.fill(234,0,0);
+        }
+        else
+        {
+          wordStr = wordStr.replace('&&clubs','\u2663');
+          card.textFont('Arial');
+          card.textSize(22);
+          card.fill(0);
+        }
+        
+      }
       if(wordStr.includes('\n'))
         {
           linectr++;
@@ -80,11 +112,11 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
   let offset;
   if(linectr<=2)
   {
-    offset=62;
+    offset=82;
   }
   else
   {
-    offset=32;
+    offset=52;
   }
   console.log(linectr);
   skill.setStartPos(sy);
