@@ -275,7 +275,7 @@ function handleImage(file)
     loadImage(file.data,(loadedImage)=>
       {
         cardArt=loadedImage;
-        cardArt.resize(630,0);
+        //cardArt.resize(630,0);
         refresh();
       })
   }
@@ -304,7 +304,7 @@ function refresh()
   skill4.setText(in_skill4.value());
   //resize card art and add it
   fullCard.rect(15,15,640,910);
-  fullCard.image(cardArt,15,15);
+  fullCard.image(cardArt,10,20);
   //create skill text boxes
   pg = createGraphics(boxW, h);
   pg.background(235,219,228,220);
