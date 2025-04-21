@@ -142,7 +142,7 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
 }
 
 var frame,cardArt,skillPlate,modifyPlate,UnlockPlate;
-var artOffset;
+var artOffsetH,artOffsetV;
 var loadedImages =0;
 var skill1,skill2,skill3,skill4,skill5,skill6;
 var skillArr;
@@ -297,9 +297,12 @@ function setup() {
   offsetLabel.style('position','absolute');
   offsetLabel.style('left','450px');
   offsetLabel.style('top','30px');
-  artOffset = createSlider(0,255);
-  artOffset.position(450,50);
-  artOffset.input(() => {refresh();});
+  artOffsetH = createSlider(0,255,0);
+  artOffsetH.position(450,50);
+  artOffsetH.input(() => {refresh();});
+  artOffsetV = createSlider(0,255,0);
+  artOffsetV.position(450,100);
+  artOffsetV.input(() => {refresh();});
   in_faction.changed(updateImages);
   in_art.changed(updateImages);
   in_hp.changed(updateImages);
@@ -308,7 +311,7 @@ function setup() {
   savebtn.style('width','150px');
   savebtn.style('height','150px');
   savebtn.mousePressed(saveCard);
-  savebtn.position(460,100);
+  savebtn.position(460,190);
 
   frame = getFrame(in_faction.value(),in_hp.value());
   skillPlate = loadImage('assets/SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
@@ -327,8 +330,9 @@ function handleImage(file)
     
     loadImage(file.data,(loadedImage)=>
       {
+        loadedImage.resize(672,0);
         art_uncropped=loadedImage;
-        art_uncropped.resize(0,910);
+        //art_uncropped.resize(0,910);
         refresh();
       })
   }
@@ -361,7 +365,8 @@ function refresh()
   skill6.setText(in_skill6.value());
   //resize card art and add it
   fullCard.rect(15,15,640,910);
-  cardArt = art_uncropped.get(0+artOffset.value(),0,630,h);
+  cardArt = art_uncropped.get(0+artOffsetH.value(),0,650,h);
+  cardArt.resize(0,1000-artOffsetV.value());
   fullCard.image(cardArt,10,20);
   //create skill text boxes
   pg = createGraphics(boxW, h);
