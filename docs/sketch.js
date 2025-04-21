@@ -47,6 +47,12 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
         card.textFont(skillTextFontBold);
         card.fill(0,0,243);
       }
+      if(wordStr.includes('##'))
+        {
+          wordStr = wordStr.replace('##','');
+          card.textFont(skillTextFontBold);
+          card.fill(25,154,160);
+        }
       if(wordStr.includes('&&'))
       {
         if(wordStr.includes('spades'))
