@@ -275,7 +275,8 @@ function handleImage(file)
     loadImage(file.data,(loadedImage)=>
       {
         cardArt=loadedImage;
-        //cardArt.resize(630,0);
+        cardArt.resize(0,910);
+        cardArt = cardArt.get(0,0,630,h);
         refresh();
       })
   }
@@ -354,7 +355,7 @@ function refresh()
   fullCard.textAlign(CENTER);
   fullCard.textLeading(65);
   fullCard.text(chName,textX,h-(namepos));
-  image(fullCard,670,0); 
+  image(fullCard,630,0); 
   loadedImages = 0;
 }
 
