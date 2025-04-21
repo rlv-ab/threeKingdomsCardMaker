@@ -112,11 +112,11 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
   let offset;
   if(linectr<=2)
   {
-    offset=82;
+    offset=62;
   }
   else
   {
-    offset=52;
+    offset=32;
   }
   console.log(linectr);
   skill.setStartPos(sy);
