@@ -375,9 +375,9 @@ function refresh()
     }
   }
   textPos+=42
-  if(textPos>500)
+  if(textPos>450)
   {
-    namepos += 100
+    namepos += 100+(textPos-500)
   }
   //add text to text box and add it to card
   fullCard.image(pg,textX,h-textPos);
@@ -433,7 +433,7 @@ function refresh()
   fullCard.strokeWeight(10);
   fullCard.textAlign(CENTER);
   fullCard.textLeading(65);
-  fullCard.text(chName,textX+ttoffs,h-(namepos));
+  fullCard.text(chName,textX,h-(namepos));
   image(fullCard,630,0); 
   loadedImages = 0;
 }
