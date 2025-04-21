@@ -142,7 +142,7 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
 }
 
 var frame,cardArt,skillPlate,modifyPlate,UnlockPlate;
-var artOffsetH,artOffsetV;
+var artOffsetH,artOffsetVd;
 var loadedImages =0;
 var skill1,skill2,skill3,skill4,skill5,skill6;
 var skillArr;
@@ -297,10 +297,10 @@ function setup() {
   offsetLabel.style('position','absolute');
   offsetLabel.style('left','450px');
   offsetLabel.style('top','30px');
-  artOffsetH = createSlider(0,255,0);
+  artOffsetH = createSlider(0,500,0);
   artOffsetH.position(450,50);
   artOffsetH.input(() => {refresh();});
-  artOffsetV = createSlider(0,255,0);
+  artOffsetV = createSlider(0,1000,0);
   artOffsetV.position(450,100);
   artOffsetV.input(() => {refresh();});
   in_faction.changed(updateImages);
@@ -364,10 +364,18 @@ function refresh()
   skill6.setTitle(in_skill6name.value());
   skill6.setText(in_skill6.value());
   //resize card art and add it
-  fullCard.rect(15,15,640,910);
-  cardArt = art_uncropped.get(0+artOffsetH.value(),0,650,h);
-  cardArt.resize(0,1000-artOffsetV.value());
-  fullCard.image(cardArt,10,20);
+  fullCard.fill(255);
+  fullCard.rect(15,15,630,910);
+  cardArt = art_uncropped.get(0+artOffsetH.value(),0,610,h);
+  cardArt.resize(0,800+artOffsetV.value());
+  let sw = cardArt.width;
+  let sh = cardArt.height;
+  if(sw > 610)
+  {
+    sw = 610;
+    sh = 910;
+  }
+  fullCard.image(cardArt,25,20,sw,sh,0,0,610,910);
   //create skill text boxes
   pg = createGraphics(boxW, h);
   pg.background(235,219,228,220);
@@ -441,6 +449,7 @@ function refresh()
   fullCard.text(chName,textX,h-(namepos));
   image(fullCard,630,0); 
   loadedImages = 0;
+  
 }
 
 function keyPressed()
