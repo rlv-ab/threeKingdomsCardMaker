@@ -53,6 +53,12 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
           card.textFont(skillTextFontBold);
           card.fill(25,154,160);
         }
+      if(wordStr.includes('=='))
+        {
+          wordStr = wordStr.replace('==','\u{1F846}');
+          card.textFont('Arial');
+          card.fill(0);
+        }
       if(wordStr.includes('&&'))
       {
         if(wordStr.includes('spades'))
