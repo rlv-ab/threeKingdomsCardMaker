@@ -413,12 +413,29 @@ function saveCard()
       const existing = event.target.result;
       if(existing)
       {
-        formData.id = existing.id
-      }
-      const addReq = objectStore.put(formData);
-      addReq.onsuccess = function()
-      {
-        alert("card saved succesfully!");
+        Swal.fire({
+            title: 'A saved card with the same name was found. Overwrite?',
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            cancelButtonText: 'No',
+            }).then((result) => {
+              let Rep = false;
+              const newTransaction = db.transaction("formData", "readwrite");
+              const newObjectStore = newTransaction.objectStore("formData");
+              if (result.isConfirmed) {
+                formData.id = existing.id
+                Rep = true;
+              } else if (result.dismiss === Swal.DismissReason.cancel) 
+              {
+                Rep = false
+              }
+              const addReq = newObjectStore.put(formData);
+              addReq.onsuccess = function()
+              {
+                if(Rep==false) Swal.fire("Card saved succesfully!")
+                else Swal.fire("Card overwritten succesfully!")
+              }
+            });
       }
     }   
 }
@@ -466,18 +483,24 @@ function loadCard()
 }
 function deleteCard(id)
 {
-  if (confirm("Are you sure you want to delete this card?") == true) {
-    const transaction = db.transaction("formData", "readwrite");
-    const objectStore = transaction.objectStore("formData");
-    const delReq = objectStore.delete(id);
-    delReq.onsuccess = function() {
-      document.getElementById("loadBox").style.display = "none";
-      deletedFlag = true;
-      loadCard();
-    };
+  Swal.fire({
+  title: 'Are you sure you want to delete this card?',
+  showCancelButton: true,
+  confirmButtonText: 'Yes',
+  cancelButtonText: 'No',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const transaction = db.transaction("formData", "readwrite");
+      const objectStore = transaction.objectStore("formData");
+      const delReq = objectStore.delete(id);
+      delReq.onsuccess = function() {
+        document.getElementById("loadBox").style.display = "none";
+        deletedFlag = true;
+        loadCard();
+      }
+    }
+  });
   }
-  
-}
 function loadSave(id) {
   let selected = allData.find(o => o.id === id);
   console.log(selected);

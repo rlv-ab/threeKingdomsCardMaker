@@ -71,3 +71,8 @@ canvas {
 .delBtn:hover{
   filter: sepia(100%) saturate(300%) brightness(70%) hue-rotate(180deg);
 }
+
+.swal2-popup {
+  font-size: 1.0rem !important;
+  font-family: Georgia, serif;
+}
