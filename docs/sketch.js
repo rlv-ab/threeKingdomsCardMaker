@@ -373,7 +373,10 @@ function saveCard()
   let thumbnail = fullCard.elt.toDataURL('image/png'); 
   let t1 = in_plate1.value(),t2 = in_plate2.value(),t3 = in_plate3.value(),
       t4 = in_plate4.value(),t5 = in_plate5.value(),t6 = in_plate6.value();
-  console.log(t1);
+  //console.log(t1);
+  let saveImg = createGraphics(art_uncropped.width, art_uncropped.height);
+  saveImg.image(art_uncropped.get(), 0, 0);
+  b64Img = saveImg.elt.toDataURL('image/png'); 
   const formData = {
       characterName: in_chname.value(),
       faction: facs,
@@ -436,6 +439,15 @@ function saveCard()
                 else Swal.fire("Card overwritten succesfully!")
               }
             });
+      }else
+      {
+        const newTransaction = db.transaction("formData", "readwrite");
+        const newObjectStore = newTransaction.objectStore("formData");
+        const addReq = newObjectStore.put(formData);
+        addReq.onsuccess = function()
+        {
+          Swal.fire("Card saved succesfully!");
+        }
       }
     }   
 }
