@@ -510,7 +510,11 @@ function loadSave(id) {
   else
   {
     //console.log(typeof selected.cardArt, selected.cardArt.slice(0, 30));
-    art_uncropped = loadImage(selected.cardArt,(loadedimage) => {loadedimage.resize(672,0);art_uncropped = loadedimage;console.log("loaded");refresh();});
+    art_uncropped = loadImage(selected.cardArt,(loadedimage) => {
+      loadedimage.resize(672,0);
+      art_uncropped = loadedimage;
+      //console.log("loaded");
+      safeRefresh("loaded");});
   }
 }
 function downloadCard()
@@ -673,6 +677,20 @@ function refresh()
   //console.log(sizeOffs);
   image(fullCard,630,0);
   saveImage();
+};
+
+var lastRef = 0;
+var refInt = 50;
+
+function safeRefresh(source)
+{
+  let curInt = millis();
+  if(curInt-lastRef > refInt || source == "loaded")
+  {
+    //console.log("safe refresh from:"+source);
+    lastRef = curInt;
+    refresh();
+  }
 }
 
 function keyPressed()
@@ -681,7 +699,7 @@ function keyPressed()
  // skillPlate = loadImage('/docs/assets//SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
   //loadImage('/docs/assets//renLin.png',(loadedImage)=>{cardArt=loadedImage; refresh();})
   setTimeout(() => {
-    refresh();
+    safeRefresh("KeyPress");
   }, "100");
   
 }
@@ -692,7 +710,7 @@ function mouseWheel(event)
     //console.log(sizeOffs);
     sizeOffs += event.delta;
     //console.log(sizeOffs);
-    refresh();
+    safeRefresh("MouseWheel");
     event.preventDefault();
     return false;
   }
@@ -703,14 +721,14 @@ function mouseDragged()
   {
     artPosX = mouseX-620;
     artPosY = mouseY-25;
-    refresh();
+    safeRefresh("MouseDrag");;
   }
 }
 
 function mouseClicked()
 {
-  if(mouseX < 650 && mouseIsPressed)
+  if(mouseX < 650)
   {
-    refresh();
+    safeRefresh("MouseClick");;
   }
 }
