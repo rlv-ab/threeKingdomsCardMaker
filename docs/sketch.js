@@ -466,7 +466,8 @@ function loadCard()
 }
 function deleteCard(id)
 {
-  const transaction = db.transaction("formData", "readwrite");
+  if (confirm("Are you sure you want to delete this card?") == true) {
+    const transaction = db.transaction("formData", "readwrite");
     const objectStore = transaction.objectStore("formData");
     const delReq = objectStore.delete(id);
     delReq.onsuccess = function() {
@@ -474,6 +475,8 @@ function deleteCard(id)
       deletedFlag = true;
       loadCard();
     };
+  }
+  
 }
 function loadSave(id) {
   let selected = allData.find(o => o.id === id);
