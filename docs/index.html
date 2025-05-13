@@ -11,9 +11,29 @@
 
     <script src="libraries/p5.min.js"></script>
     <script src="libraries/p5.sound.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
   </head>
 
   <body>
     <script src="sketch.js"></script>
+    <div id="loadBox" class="modal">
+      <div class="modal-content">
+        <span class="close" id="close">&times;</span>
+        <div id="savedList"></div>
+      </div>
+    </div>
+   
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    var close = document.getElementById("close");
+    var loadBox = document.getElementById("loadBox");
+
+    close.onclick = function() {
+      loadBox.style.display = "none";
+    }
+    });
+    </script>
+
   </body>
 </html>

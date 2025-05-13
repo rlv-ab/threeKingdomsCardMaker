@@ -4,10 +4,10 @@ function getFrame(faction,health) {
   return fac;
 }
 
-var textString = '$$Once $$per $$action $$phase: When you use **Strike or a **black-colored **basic **scroll **card and designate only one target, you may have another character who could legally be a target of this card choose one of the following options:  \n \n \n **1. **Give **you **a **card, then become the user of this card in your place. \n **2. **Also **become **a **target of this card.';
+var db;
 var w = 672, h = 944;
-var boxW=570, boxH=400;
-let pg,fullCard;
+var boxW=558, boxH=400;
+let pg,fullCard, fullCardimg;
 
 function textSkill(card,skillText,sx,sy,mh,mw,skill) {
   let skillText_nl = skillText.replaceAll("\n"," \n ")
@@ -137,7 +137,7 @@ function textSkill(card,skillText,sx,sy,mh,mw,skill) {
   {
     offset=58;
   }
-  console.log(linectr);
+  //console.log(linectr);
   skill.setStartPos(sy);
   skill.setPos((y+offset));
 }
@@ -147,7 +147,7 @@ var artOffsetH,artOffsetVd;
 var loadedImages =0;
 var skill1,skill2,skill3,skill4,skill5,skill6;
 var skillArr;
-var chName, art,hp,faction
+var chName, art,hp,faction, b64Img;
 
 class Skill 
 {
@@ -179,6 +179,7 @@ function preload()
   nameFont = loadFont('assets/Mistral Regular.ttf')
   modifyPlate = loadImage('assets/ModifyPlate.png')
   UnlockPlate = loadImage('assets/UnlockPlate.png')
+  defaultImage = loadImage('assets/Dummy.png')
 }
 
 var in_faction,in_chname, in_hp, in_art, savebtn,
@@ -188,7 +189,10 @@ in_skill2,in_skill2name, in_plate2,
 in_skill3,in_skill3name, in_plate3,
 in_skill4,in_skill4name, in_plate4,
 in_skill5,in_skill5name, in_plate5,
-in_skill6,in_skill6name, in_plate6;
+in_skill6,in_skill6name, in_plate6,
+artPosX =0,artPosY= 0,sizeOffs = 0;
+
+var allData;
 function textBox(name,id,posX,posY,BW,BH)
 {
   if(name != 'noLabel')
@@ -244,9 +248,10 @@ function dropDown(id,posX,posY,BW,BH,type)
       ref = createElement('select',
         ['<option value=\"Normal\">Normal</option>',
          '<option value=\"Modify\">Modify</option>',
-         '<option value=\"Unlock\">Unlock</option>',
+         '<option value=\"Unlock\">Enforced</option>',
         ]);
     }
+  ref.id(id);
   ref.style('position','absolute');
   ref.style('left',posX+'px');
   ref.style('top',posY+'px');
@@ -292,34 +297,223 @@ function setup() {
   in_art.position(50,230);
   in_faction = dropDown('fac',50,50,150,50,'Faction')
   in_hp = dropDown('hp',210,50,150,50,'Health')
-  let offsetLabel = createElement('offsLabel')
-  offsetLabel.id('offs_label');
-  document.getElementById('offs_label').innerHTML = 'Art Position';
-  offsetLabel.style('position','absolute');
-  offsetLabel.style('left','450px');
-  offsetLabel.style('top','30px');
-  artOffsetH = createSlider(0,500,0);
-  artOffsetH.position(450,50);
-  artOffsetH.input(() => {refresh();});
-  artOffsetV = createSlider(0,1000,0);
-  artOffsetV.position(450,100);
-  artOffsetV.input(() => {refresh();});
   in_faction.changed(updateImages);
   in_art.changed(updateImages);
   in_hp.changed(updateImages);
   savebtn = createButton('save card');
   savebtn.style('font-size','')
   savebtn.style('width','150px');
-  savebtn.style('height','150px');
+  savebtn.style('height','50px');
   savebtn.mousePressed(saveCard);
-  savebtn.position(460,190);
+  savebtn.position(460,50);
+  loadbtn = createButton('load card');
+  loadbtn.style('font-size','')
+  loadbtn.style('width','150px');
+  loadbtn.style('height','50px');
+  loadbtn.mousePressed(loadCard);
+  loadbtn.position(460,100);
+  downloadbtn = createButton('download card');
+  downloadbtn.style('font-size','')
+  downloadbtn.style('width','150px');
+  downloadbtn.style('height','50px');
+  downloadbtn.mousePressed(downloadCard);
+  downloadbtn.position(460,150);
 
   frame = getFrame(in_faction.value(),in_hp.value());
   skillPlate = loadImage('assets/SkillPlateQun.png',(loadedPlate)=>{skillPlate=loadedPlate; refresh();})
-  loadImage('assets/dummy.png',(loadedImage)=>{art_uncropped=loadedImage; refresh();})
+  art_uncropped = defaultImage;
+  b64Img = 0;
+  
+  let request = window.indexedDB.open("savedCards");
+
+  request.onerror = event => {
+    console.error("Database error: " + event.target.errorCode);
+  };
+  request.onsuccess = event => {
+    db = event.target.result;
+  };
+  request.onupgradeneeded = function(event) {
+      db = event.target.result;
+      const objectStore = db.createObjectStore("formData", { keyPath: "id", autoIncrement: true });
+      objectStore.createIndex("lookupId", "lookupId", { unique: true, autoIncrement: true });
+      objectStore.createIndex("characterName", "characterName", { unique: false });
+      objectStore.createIndex("faction", "faction", { unique: false });
+      objectStore.createIndex("hp", "hp", { unique: false });
+      objectStore.createIndex("cardArt", "cardArt", { unique: false });
+      objectStore.createIndex("thumbnail", "thumbnail", { unique: false });
+      objectStore.createIndex("skill1Title", "skill1Title", { unique: false });
+      objectStore.createIndex("skill1Text", "skill1Text", { unique: false });
+      objectStore.createIndex("skill1Type", "skill1Type", { unique: false });
+      objectStore.createIndex("skill2Title", "skill2Title", { unique: false });
+      objectStore.createIndex("skill2Text", "skill2Text", { unique: false });
+      objectStore.createIndex("skill2Type", "skill2Type", { unique: false });
+      objectStore.createIndex("skill3Title", "skill3Title", { unique: false });
+      objectStore.createIndex("skill3Text", "skill3Text", { unique: false });
+      objectStore.createIndex("skill3Type", "skill3Type", { unique: false });
+      objectStore.createIndex("skill4Title", "skill4Title", { unique: false });
+      objectStore.createIndex("skill4Text", "skill4Text", { unique: false });
+      objectStore.createIndex("skill4Type", "skill4Type", { unique: false });
+      objectStore.createIndex("skill5Title", "skill5Title", { unique: false });
+      objectStore.createIndex("skill5Text", "skill5Text", { unique: false });
+      objectStore.createIndex("skill5Type", "skill5Type", { unique: false });
+      objectStore.createIndex("skill6Title", "skill6Title", { unique: false });
+      objectStore.createIndex("skill6Text", "skill6Text", { unique: false });
+      objectStore.createIndex("skill6Type", "skill6Type", { unique: false });
+      objectStore.createIndex("artPosX", "artPosX", { unique: false });
+      objectStore.createIndex("artPosY", "artPosY", { unique: false });
+      objectStore.createIndex("sizeOffs", "sizeOffs", { unique: false });
+  };
+
 }
 
 function saveCard()
+{
+  let facs = in_faction.value()
+  let hps = in_hp.value()
+  let thumbnail = fullCard.elt.toDataURL('image/png'); 
+  let t1 = in_plate1.value(),t2 = in_plate2.value(),t3 = in_plate3.value(),
+      t4 = in_plate4.value(),t5 = in_plate5.value(),t6 = in_plate6.value();
+  console.log(t1);
+  const formData = {
+      characterName: in_chname.value(),
+      faction: facs,
+      hp: hps,
+      cardArt: b64Img,
+      thumbnail: thumbnail,
+      skill1Title: in_skill1name.value(),
+      skill1Text: in_skill1.value(),
+      skill1Type: t1,
+      skill2Title: in_skill2name.value(),
+      skill2Text: in_skill2.value(),
+      skill2Type: t2,
+      skill3Title: in_skill3name.value(),
+      skill3Text: in_skill3.value(),
+      skill3Type: t3,
+      skill4Title: in_skill4name.value(),
+      skill4Text: in_skill4.value(),
+      skill4Type: t4,
+      skill5Title: in_skill5name.value(),
+      skill5Text: in_skill5.value(),
+      skill5Type: t5,
+      skill6Title: in_skill6name.value(),
+      skill6Text: in_skill6.value(),
+      skill6Type: t6,
+      artPosX: artPosX,
+      artPosY: artPosY,
+      sizeOffs: sizeOffs
+    };
+
+    const transaction = db.transaction("formData", "readwrite");
+    const objectStore = transaction.objectStore("formData");
+    const index = objectStore.index("characterName");
+
+    const getReq = index.get(formData.characterName);
+    getReq.onsuccess = function(event)
+    {
+      const existing = event.target.result;
+      if(existing)
+      {
+        formData.id = existing.id
+      }
+      const addReq = objectStore.put(formData);
+      addReq.onsuccess = function()
+      {
+        alert("card saved succesfully!");
+      }
+    }   
+}
+let deletedFlag = false;
+function loadCard()
+{
+    const transaction = db.transaction(["formData"], "readonly");
+    const objectStore = transaction.objectStore("formData");
+
+    const loadReq = objectStore.getAll();  // Fetch all records
+    
+    loadReq.onsuccess = function(event) {
+    allData = event.target.result;
+    const saveList = document.getElementById("savedList");
+    saveList.innerHTML = ''; // Clear previous list
+    allData.forEach(save => {
+      const item = document.createElement("img");
+      item.src = save.thumbnail;
+      item.width = 100;
+      item.textContent = `${save.characterName}`;
+      item.classList.add("save-option");
+      item.onclick = () => {
+        console.log(save.id);
+        loadSave(save.id);
+        var loadBox = document.getElementById("loadBox");
+        loadBox.style.display = "none";
+      };
+      const label = document.createElement("label")
+      label.textContent = `${save.characterName}`;
+      label.classList.add("label")
+      const delBtn = document.createElement("img")
+      delBtn.src = "assets/trashIcon.png";
+      delBtn.classList.add("delBtn");
+      delBtn.onclick = () => {
+        deleteCard(save.id);
+      }
+      delBtn.width=30;
+      saveList.appendChild(item);
+      saveList.appendChild(delBtn);
+    });
+
+    document.getElementById("loadBox").style.display = "block";
+    }; 
+    
+}
+function deleteCard(id)
+{
+  const transaction = db.transaction("formData", "readwrite");
+    const objectStore = transaction.objectStore("formData");
+    const delReq = objectStore.delete(id);
+    delReq.onsuccess = function() {
+      document.getElementById("loadBox").style.display = "none";
+      deletedFlag = true;
+      loadCard();
+    };
+}
+function loadSave(id) {
+  let selected = allData.find(o => o.id === id);
+  console.log(selected);
+  in_chname.value(selected.characterName);
+  in_faction.value(selected.faction);
+  in_hp.value(selected.hp);
+  frame = getFrame(in_faction.value(),in_hp.value());
+  in_skill1.value(selected.skill1Text);
+  in_skill1name.value(selected.skill1Title);
+  in_plate1.value(selected.skill1Type);
+  in_skill2.value(selected.skill2Text);
+  in_skill2name.value(selected.skill2Title);
+  in_plate2.value(selected.skill2Type);
+  in_skill3.value(selected.skill3Text);
+  in_skill3name.value(selected.skill3Title);
+  in_plate3.value(selected.skill3Type);
+  in_skill4.value(selected.skill4Text);
+  in_skill4name.value(selected.skill4Title);
+  in_plate4.value(selected.skill4Type);
+  in_skill5.value(selected.skill5Text);
+  in_skill5name.value(selected.skill5Title);
+  in_plate5.value(selected.skill5Type);
+  in_skill6.value(selected.skill6Text);
+  in_skill6name.value(selected.skill6Title);
+  in_plate6.value(selected.skill6Type);
+  artPosX = selected.artPosX;
+  artPosY = selected.artPosY;
+  sizeOffs = selected.sizeOffs;
+  if(selected.cardArt < 10)
+  {
+    art_uncropped = defaultImage;
+  }
+  else
+  {
+    //console.log(typeof selected.cardArt, selected.cardArt.slice(0, 30));
+    art_uncropped = loadImage(selected.cardArt,(loadedimage) => {loadedimage.resize(672,0);art_uncropped = loadedimage;console.log("loaded");refresh();});
+  }
+}
+function downloadCard()
 {
   save(fullCard,'Card_'+chName+'.png')
 }
@@ -333,6 +527,9 @@ function handleImage(file)
       {
         loadedImage.resize(672,0);
         art_uncropped=loadedImage;
+        let saveImg = createGraphics(art_uncropped.width, art_uncropped.height);
+        saveImg.image(loadedImage, 0, 0);
+        b64Img = saveImg.elt.toDataURL('image/png'); 
         //art_uncropped.resize(0,910);
         refresh();
       })
@@ -344,8 +541,21 @@ function updateImages()
   //loadImage(in_art.value(),(loadedImage)=>{cardArt=loadedImage; refresh();})
 }
 
+let lastArtUpdate = -1;
+async function saveImage() {
+  if(art_uncropped != lastArtUpdate)
+  {
+    let saveImg = createGraphics(art_uncropped.width, art_uncropped.height);
+    saveImg.image(art_uncropped.get(), 0, 0);
+    b64Img = saveImg.elt.toDataURL('image/png'); 
+    lastArtUpdate = art_uncropped;
+  }  
+}
+
 function refresh()
 {
+  fullCard.clear();
+  let temp = createGraphics(fullCard.width,fullCard.height);
   background('aqua');
   let posx = 672, posy=944;
   let textX = 90;
@@ -365,18 +575,22 @@ function refresh()
   skill6.setTitle(in_skill6name.value());
   skill6.setText(in_skill6.value());
   //resize card art and add it
-  fullCard.fill(255);
-  fullCard.rect(15,15,630,910);
-  cardArt = art_uncropped.get(0+artOffsetH.value(),0,610,h);
-  cardArt.resize(0,800+artOffsetV.value());
+  let tempImg = createGraphics(temp.width,temp.height);
+  tempImg.fill(255);
+  tempImg.rect(15,15,630,910);
+  cardArt = art_uncropped.get();
+  cardArt.resize(cardArt.width+sizeOffs,0);
   let sw = cardArt.width;
   let sh = cardArt.height;
-  if(sw > 610)
+  if(artPosX == 0)
   {
-    sw = 610;
-    sh = 910;
+    artPosX = 25 + sw/2;
+    artPosY = 20 + sh/2;
   }
-  fullCard.image(cardArt,25,20,sw,sh,0,0,610,910);
+  
+  tempImg.image(cardArt,(artPosX-(sw/2)),(artPosY-(sh/2)));
+  let img = tempImg.get(25,20,627,910);
+  temp.image(img,25,20);
   //create skill text boxes
   pg = createGraphics(boxW, h);
   pg.background(235,219,228,220);
@@ -394,9 +608,9 @@ function refresh()
     namepos += 100+(textPos-480)
   }
   //add text to text box and add it to card
-  fullCard.image(pg,textX,h-textPos);
+  temp.image(pg,textX,h-textPos);
   //add card frame
-  fullCard.image(frame,0,0,posx,posy);
+  temp.image(frame,0,0,posx,posy);
   //add skill plates & title
   let ttoffs = 0;
   for(let t=0;t<skillArr.length;t++)
@@ -416,18 +630,18 @@ function refresh()
         }
         else plt = skillPlate;
         plt.resize(160,0);
-        fullCard.image(plt,textX-50,h-(textPos-skillArr[t].startPos+18));
-        fullCard.textFont(skillTitleFont);
-        fullCard.textSize(30);
-        fullCard.fill(255);
-        fullCard.stroke(0);
-        fullCard.strokeWeight(5);
+        temp.image(plt,textX-50,h-(textPos-skillArr[t].startPos+18));
+        temp.textFont(skillTitleFont);
+        temp.textSize(30);
+        temp.fill(255);
+        temp.stroke(0);
+        temp.strokeWeight(5);
         if(ttoffs != 0)
           {
-            fullCard.textAlign(LEFT);
+            temp.textAlign(LEFT);
           }
-          else fullCard.textAlign(CENTER);
-        fullCard.textLeading(24);
+          else temp.textAlign(CENTER);
+        temp.textLeading(24);
         let offset=0;
         if(plateArr[t].value() == 'Modify' || 
            plateArr[t].value() == 'Unlock')
@@ -435,22 +649,30 @@ function refresh()
           offset =-3
         }
         if(skillArr[t].title.includes("\n")){offset = 12;}
-        fullCard.text(skillArr[t].title,textX+28+ttoffs,h-(textPos-skillArr[t].startPos)+14-offset);
+        temp.text(skillArr[t].title,textX+28+ttoffs,h-(textPos-skillArr[t].startPos)+14-offset);
       }
       
     }
   
-  fullCard.textFont(nameFont);
-  fullCard.textSize(70);
-  fullCard.fill(255);
-  fullCard.stroke(0);
-  fullCard.strokeWeight(10);
-  fullCard.textAlign(CENTER);
-  fullCard.textLeading(65);
-  fullCard.text(chName,textX,h-(namepos));
-  image(fullCard,630,0); 
-  loadedImages = 0;
   
+  temp.textFont(nameFont);
+  temp.textSize(70);
+  temp.fill(255);
+  temp.stroke(0);
+  temp.strokeWeight(10);
+  temp.textAlign(CENTER);
+  temp.textLeading(65);
+  temp.text(chName,textX,h-(namepos));
+  /* temp.textFont(skillTextFont);
+  temp.textSize(20);
+  temp.text(mouseX,30,40);
+  temp.text(mouseY,100,40); */
+  //image(temp,630,0); 
+  fullCardimg = temp.get();
+  fullCard.image(fullCardimg,0,0);
+  //console.log(sizeOffs);
+  image(fullCard,630,0);
+  saveImage();
 }
 
 function keyPressed()
@@ -463,8 +685,32 @@ function keyPressed()
   }, "100");
   
 }
+function mouseWheel(event)
+{
+  if(mouseX >= 650 && mouseY >= 25)
+  {
+    //console.log(sizeOffs);
+    sizeOffs += event.delta;
+    //console.log(sizeOffs);
+    refresh();
+    event.preventDefault();
+    return false;
+  }
+}
+function mouseDragged()
+{
+  if(mouseX >= 650 && mouseY >= 25)
+  {
+    artPosX = mouseX-620;
+    artPosY = mouseY-25;
+    refresh();
+  }
+}
 
 function mouseClicked()
 {
-  refresh();
+  if(mouseX < 650 && mouseIsPressed)
+  {
+    refresh();
+  }
 }
